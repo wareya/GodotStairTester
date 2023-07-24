@@ -15,20 +15,21 @@ texture_filter = 5
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6j7a6"]
 albedo_texture = ExtResource("2_x5sg2")
 uv1_triplanar = true
+uv1_triplanar_sharpness = 150.0
 uv1_world_triplanar = true
 texture_filter = 5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uatdx"]
 albedo_texture = ExtResource("3_35qmt")
 uv1_triplanar = true
-uv1_triplanar_sharpness = 2.92819e-05
+uv1_triplanar_sharpness = 150.0
 uv1_world_triplanar = true
 texture_filter = 5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fxdaq"]
 albedo_texture = ExtResource("4_by77g")
 uv1_triplanar = true
-uv1_triplanar_sharpness = 1e-05
+uv1_triplanar_sharpness = 150.0
 uv1_world_triplanar = true
 texture_filter = 5
 
@@ -249,7 +250,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.90669, 1.46182, -1)
 pixel_size = 0.0025
 text = "It should be possible to step
 onto the first step, but not
-onto the second."
+onto the second, from
+this direction."
 
 [node name="Label3D4" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.47481, 1.46182, -0.977026)
