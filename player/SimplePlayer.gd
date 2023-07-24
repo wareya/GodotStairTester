@@ -1,0 +1,132 @@
+extends CharacterBody3D
+
+const unit_conversion = 64.0
+
+
+# Get the gravity from the project settings to be synced with RigidBody nodes.
+const gravity = 800.0/unit_conversion
+
+const mouse_sens = 0.022 * 3.0
+
+const max_speed = 320.0/unit_conversion
+const max_speed_air = 320.0/unit_conversion
+const accel = 15.0
+const accel_air = 2.0
+
+const jumpvel = 270.0/unit_conversion
+
+func _input(event: InputEvent) -> void:
+    if event is InputEventMouseMotion:
+        if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+            $CameraHolder.rotation_degrees.y -= event.relative.x * mouse_sens
+            $CameraHolder.rotation_degrees.x -= event.relative.y * mouse_sens
+            $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
+
+func _unhandled_input(event: InputEvent) -> void:
+    if event.is_action_pressed("m1") or event.is_action_pressed("m2"):
+        if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+            Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+        else:
+            Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+    
+var wish_dir = Vector3()
+var friction = 6.0
+
+func _friction(_velocity : Vector3, delta : float) -> Vector3:
+    var speed = _velocity.length()
+    var drag = 1.0
+    _velocity *= pow(0.9, delta*60.0)
+    if wish_dir == Vector3():
+        _velocity = _velocity.move_toward(Vector3(), delta * max_speed)
+    return _velocity
+
+func handle_friction(delta):
+    if is_on_floor():
+        velocity = _friction(velocity, delta)
+
+func handle_accel(delta):
+    if wish_dir != Vector3():
+        var actual_maxspeed = max_speed if is_on_floor() else max_speed_air
+        var actual_accel = (accel if is_on_floor() else accel_air) * actual_maxspeed
+        
+        var floor_velocity = Vector3(velocity.x, 0, velocity.z)
+        var speed_in_wish_dir = floor_velocity.dot(wish_dir.normalized())
+        if speed_in_wish_dir < actual_maxspeed:
+            var add_limit = actual_maxspeed - speed_in_wish_dir
+            var add_amount = min(add_limit, actual_accel*delta)
+            velocity += wish_dir.normalized() * add_amount
+
+func handle_friction_and_accel(delta):
+    handle_friction(delta)
+    handle_accel(delta)
+
+func _is_on_floor() -> bool:
+    return is_on_floor()
+
+@export var do_stairs : bool = false
+
+func _process(delta: float) -> void:
+    if $"../StairsSetting":
+        do_stairs = $"../StairsSetting".button_pressed
+    
+    $"../FPS".text = str(Engine.get_frames_per_second())
+    $"../Vel".text = str(velocity)
+
+    if Input.is_action_pressed("jump") and _is_on_floor():
+        velocity.y = jumpvel
+        floor_snap_length = 0.0
+    elif _is_on_floor():
+        floor_snap_length = 0.5
+    
+    var input_dir := Input.get_vector("left", "right", "forward", "backward")
+    wish_dir = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, $CameraHolder.global_rotation.y)
+    if wish_dir.length_squared() > 1.0:
+        wish_dir = wish_dir.normalized()
+    
+    handle_friction_and_accel(delta)
+
+    var step_height = 0.5
+
+    if not _is_on_floor():
+        velocity.y -= gravity * delta * 0.5
+    
+    # check for simple stairs; three steps
+    var start_position = global_position
+    var found_stairs = false
+    var wall_test_travel = null
+    var wall_collision = null
+    if do_stairs:
+        # step 1: upwards trace
+        var ceiling_collision = move_and_collide(step_height * Vector3.UP)
+        var ceiling_travel_distance = step_height if not ceiling_collision else abs(ceiling_collision.get_travel().y)
+        # step 2: "check if there's a wall" trace
+        wall_test_travel = velocity * delta
+        wall_collision = move_and_collide(wall_test_travel)
+        # step 3: downwards trace
+        var floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
+        if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
+            found_stairs = true
+    
+    # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
+    if found_stairs:
+        # if we found stairs, climb up them
+        var old_velocity = velocity
+        if wall_collision and wall_test_travel.length_squared() > 0.0:
+            # try to apply the remaining travel distance if we hit a wall
+            var remaining_factor = wall_collision.get_remainder().length() / wall_test_travel.length()
+            velocity *= remaining_factor
+            move_and_slide()
+            velocity /= remaining_factor
+        else:
+            # even if we didn't hit a wall, we still need to use move_and_slide to make is_on_floor() work properly
+            var old_vel = velocity
+            velocity = Vector3()
+            move_and_slide()
+            velocity = old_vel
+    else:
+        # no stairs, do "normal" non-stairs movement
+        global_position = start_position
+        move_and_slide()
+
+    if not _is_on_floor():
+        velocity.y -= gravity * delta * 0.5

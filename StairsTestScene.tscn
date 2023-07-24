@@ -1,0 +1,318 @@
+[gd_scene load_steps=11 format=3 uid="uid://b5rmjajnlo22w"]
+
+[ext_resource type="Texture2D" uid="uid://8jjphj6non1s" path="res://art/blockmesh texture darkgray.png" id="1_x707m"]
+[ext_resource type="Texture2D" uid="uid://blejfycf2xpm7" path="res://art/blockmesh texture blue.png" id="2_x5sg2"]
+[ext_resource type="Texture2D" uid="uid://cuy43ijkbhula" path="res://art/blockmesh texture green.png" id="3_35qmt"]
+[ext_resource type="Texture2D" uid="uid://1ihienek4uv4" path="res://art/blockmesh texture purple.png" id="4_by77g"]
+[ext_resource type="Texture2D" uid="uid://cqtrnlqmmhffx" path="res://art/blockmesh texture red.png" id="5_73yqw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kp031"]
+albedo_texture = ExtResource("1_x707m")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6j7a6"]
+albedo_texture = ExtResource("2_x5sg2")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uatdx"]
+albedo_texture = ExtResource("3_35qmt")
+uv1_triplanar = true
+uv1_triplanar_sharpness = 2.92819e-05
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fxdaq"]
+albedo_texture = ExtResource("4_by77g")
+uv1_triplanar = true
+uv1_triplanar_sharpness = 1e-05
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ihnv6"]
+albedo_texture = ExtResource("5_73yqw")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[node name="Level" type="Node3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(42.25, 1, 34)
+material = SubResource("StandardMaterial3D_kp031")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, -1.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D12" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -3.70001, 0, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D32" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -2.0101, 0, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D20" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 7.25, 0, -2.5)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D13" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2.70001, 2.1875, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D14" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -3.97459, 1.0625, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D23" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -5.52437, 1.4375, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D25" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -7.64937, 1.1875, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D26" type="CSGPolygon3D" parent="."]
+transform = Transform3D(1.91069e-15, -1, -4.37114e-08, -4.37114e-08, -4.37114e-08, 1, -1, 0, -4.37114e-08, -10.1494, 3, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+depth = 3.0
+material = SubResource("StandardMaterial3D_fxdaq")
+
+[node name="CSGBox3D27" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-5.73206e-15, 1, 1.31134e-07, 4.37114e-08, 1.31134e-07, -1, -1, 0, -4.37114e-08, -10.6494, 0, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+depth = 3.0
+material = SubResource("StandardMaterial3D_fxdaq")
+
+[node name="CSGBox3D24" type="CSGPolygon3D" parent="."]
+transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, -6.52437, -0.625, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D28" type="CSGPolygon3D" parent="."]
+transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, -10.8994, -0.625, -2)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.25, -0.5625)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.25, -0.6875)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.375, -1.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.625, -2.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, -2.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.125, -1.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.375, -1.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.625, -2.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.875, -2.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D15" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.1875, -1.25)
+use_collision = true
+size = Vector3(0.990841, 0.25, 0.491446)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D16" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.125, -1.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D21" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 1.125, -1.25)
+use_collision = true
+size = Vector3(1, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="CSGBox3D22" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.75, 1.125, -1.25)
+use_collision = true
+size = Vector3(0.5, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="CSGBox3D17" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.375, -1.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D18" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.625, -2.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D19" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.875, -2.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.46182, -1)
+pixel_size = 0.0025
+text = "It *should* be possible to climb
+this entire staircase"
+
+[node name="Label3D10" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.893967, 1.375)
+pixel_size = 0.0025
+text = "Assuming the right collision shape size,
+everything on this map should work
+roughly the same with both AABB
+and cylinder character collision
+shapes. Capsules won't test properly
+with the specific sizing here, but
+tighter variations would test properly.
+
+AABB dimensions: 0.625, 1.75, 0.625
+(full extents, not half extents)"
+
+[node name="Label3D2" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.03169, 1.46182, -1)
+pixel_size = 0.0025
+text = "It should *NOT* be possible to climb
+this entire staircase. the player should
+get snagged on the
+ceiling block."
+
+[node name="Label3D3" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.90669, 1.46182, -1)
+pixel_size = 0.0025
+text = "It should be possible to step
+onto the first step, but not
+onto the second."
+
+[node name="Label3D4" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.47481, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "It *SHOULD* be possible
+to step onto the green
+ramp from this direction,
+without being forced
+to jump,
+even with an AABB
+collision shape"
+
+[node name="Label3D5" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.12485, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "glitch testing"
+
+[node name="Label3D12" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.57804, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "simple 2:1 ramp"
+
+[node name="Label3D6" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.35497, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "glitch testing"
+
+[node name="Label3D7" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.15945, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "glitch testing"
+
+[node name="Label3D8" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.00267, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "glitch testing"
+
+[node name="Label3D9" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.3718, 1.46182, -0.977026)
+pixel_size = 0.0025
+text = "glitch testing"
+
+[node name="CSGBox3D29" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.707107, -0.707107, -6.18172e-08, -4.37114e-08, -4.37114e-08, 1, -0.707107, 0.707107, -7.10543e-15, -13.6255, 3, -2.12289)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+depth = 3.0
+material = SubResource("StandardMaterial3D_fxdaq")
+
+[node name="CSGBox3D30" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.707107, 0.707107, 6.18172e-08, 4.37114e-08, 1.31134e-07, -1, -0.707107, -0.707107, -1.23634e-07, -13.8541, 0, -1.89433)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+depth = 3.0
+material = SubResource("StandardMaterial3D_fxdaq")
+
+[node name="CSGBox3D31" type="CSGPolygon3D" parent="."]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -14.0934, -0.625, -1.65506)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="Label3D11" type="Label3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -12.997, 1.46182, -1.30475)
+pixel_size = 0.0025
+text = "glitch testing"
