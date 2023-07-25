@@ -264,6 +264,35 @@ to jump,
 even with an AABB
 collision shape"
 
+[node name="CSGBox3D33" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, -0.707107, 11.8129, 0, -1.84742)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D34" type="CSGBox3D" parent="."]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 11.1058, 1.125, -0.786758)
+use_collision = true
+size = Vector3(1, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="CSGBox3D35" type="CSGBox3D" parent="."]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 9.86833, 1.125, -2.02419)
+use_collision = true
+size = Vector3(0.5, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="Label3D13" type="Label3D" parent="."]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, 10.1878, 1.46182, -1.31865)
+pixel_size = 0.0025
+text = "It *SHOULD* be possible
+to step onto the green
+ramp from this direction,
+without being forced
+to jump,
+even with an AABB
+collision shape"
+
 [node name="Label3D5" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.12485, 1.46182, -0.977026)
 pixel_size = 0.0025

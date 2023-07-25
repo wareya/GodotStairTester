@@ -1,8 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://byikl3mg1l0io"]
+[gd_scene load_steps=13 format=3 uid="uid://byikl3mg1l0io"]
 
 [ext_resource type="PackedScene" uid="uid://b5rmjajnlo22w" path="res://StairsTestScene.tscn" id="1_0ystr"]
 [ext_resource type="Script" path="res://player/SimplePlayer.gd" id="1_2s7tp"]
 [ext_resource type="Script" path="res://ResetButton.gd" id="3_2mp0y"]
+[ext_resource type="Script" path="res://CollisionBoxPicker.gd" id="4_1xxhe"]
+[ext_resource type="Script" path="res://StairsSetting.gd" id="4_05imk"]
+[ext_resource type="Script" path="res://ThirdPersonButton.gd" id="6_im2oe"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_21fc1"]
 sky_top_color = Color(0.172549, 0.517647, 1, 1)
@@ -22,8 +25,12 @@ glow_enabled = true
 size = Vector3(0.625, 1.75, 0.625)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_eu7ao"]
-height = 1.8
+height = 1.75
 radius = 0.313
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_oswhk"]
+radius = 0.313
+height = 1.75
 
 [node name="World" type="Node3D"]
 
@@ -40,14 +47,19 @@ wall_min_slide_angle = 0.0
 floor_constant_speed = true
 script = ExtResource("1_2s7tp")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+[node name="AABB" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
 shape = SubResource("BoxShape3D_x1wx2")
+disabled = true
 
-[node name="CollisionShape3D2" type="CollisionShape3D" parent="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+[node name="Cylinder" type="CollisionShape3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
 shape = SubResource("CylinderShape3D_eu7ao")
 disabled = true
+
+[node name="Capsule" type="CollisionShape3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+shape = SubResource("CapsuleShape3D_oswhk")
 
 [node name="CameraHolder" type="Node3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
@@ -59,7 +71,7 @@ fov = 90.0
 
 [node name="Panel" type="Panel" parent="."]
 offset_right = 292.0
-offset_bottom = 145.0
+offset_bottom = 204.0
 
 [node name="FPS" type="Label" parent="."]
 offset_right = 40.0
@@ -88,9 +100,28 @@ script = ExtResource("3_2mp0y")
 [node name="StairsSetting" type="CheckButton" parent="."]
 offset_left = 3.0
 offset_top = 114.0
-offset_right = 47.0
-offset_bottom = 138.0
+offset_right = 185.0
+offset_bottom = 145.0
 button_pressed = true
 text = "Do Stair Stepping"
+script = ExtResource("4_05imk")
+
+[node name="CollisionBox" type="OptionButton" parent="."]
+offset_left = 3.0
+offset_top = 145.0
+offset_right = 17.0
+offset_bottom = 165.0
+script = ExtResource("4_1xxhe")
+
+[node name="ThirdPerson" type="CheckButton" parent="."]
+offset_left = 3.0
+offset_top = 173.0
+offset_right = 185.0
+offset_bottom = 204.0
+text = "Third Person"
+script = ExtResource("6_im2oe")
 
 [connection signal="pressed" from="ResetButton" to="ResetButton" method="_on_pressed"]
+[connection signal="pressed" from="StairsSetting" to="StairsSetting" method="_on_pressed"]
+[connection signal="item_selected" from="CollisionBox" to="CollisionBox" method="_on_item_selected"]
+[connection signal="pressed" from="ThirdPerson" to="ThirdPerson" method="_on_pressed"]

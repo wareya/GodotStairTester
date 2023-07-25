@@ -1,19 +1,22 @@
 extends CharacterBody3D
 
-const unit_conversion = 64.0
-
-
-# Get the gravity from the project settings to be synced with RigidBody nodes.
-const gravity = 800.0/unit_conversion
+func _ready() -> void:
+    $"../CollisionBox".add_item("AABB")
+    $"../CollisionBox".add_item("Cylinder")
+    $"../CollisionBox".add_item("Capsule")
 
 const mouse_sens = 0.022 * 3.0
 
+const unit_conversion = 64.0
+
+const gravity = 800.0/unit_conversion
+const jumpvel = 270.0/unit_conversion
+
 const max_speed = 320.0/unit_conversion
 const max_speed_air = 320.0/unit_conversion
+
 const accel = 15.0
 const accel_air = 2.0
-
-const jumpvel = 270.0/unit_conversion
 
 func _input(event: InputEvent) -> void:
     if event is InputEventMouseMotion:
@@ -28,13 +31,11 @@ func _unhandled_input(event: InputEvent) -> void:
             Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
         else:
             Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-    
+
 var wish_dir = Vector3()
 var friction = 6.0
 
 func _friction(_velocity : Vector3, delta : float) -> Vector3:
-    var speed = _velocity.length()
-    var drag = 1.0
     _velocity *= pow(0.9, delta*60.0)
     if wish_dir == Vector3():
         _velocity = _velocity.move_toward(Vector3(), delta * max_speed)
@@ -71,7 +72,11 @@ func _process(delta: float) -> void:
     
     $"../FPS".text = str(Engine.get_frames_per_second())
     $"../Vel".text = str(velocity)
-
+    
+    $AABB.disabled = $"../CollisionBox".selected != 0
+    $Cylinder.disabled = $"../CollisionBox".selected != 1
+    $Capsule.disabled = $"../CollisionBox".selected != 2
+    
     if Input.is_action_pressed("jump") and _is_on_floor():
         velocity.y = jumpvel
         floor_snap_length = 0.0
@@ -84,9 +89,9 @@ func _process(delta: float) -> void:
         wish_dir = wish_dir.normalized()
     
     handle_friction_and_accel(delta)
-
+    
     var step_height = 0.5
-
+    
     if not _is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
@@ -110,7 +115,6 @@ func _process(delta: float) -> void:
     # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
     if found_stairs:
         # if we found stairs, climb up them
-        var old_velocity = velocity
         if wall_collision and wall_test_travel.length_squared() > 0.0:
             # try to apply the remaining travel distance if we hit a wall
             var remaining_factor = wall_collision.get_remainder().length() / wall_test_travel.length()
@@ -127,6 +131,9 @@ func _process(delta: float) -> void:
         # no stairs, do "normal" non-stairs movement
         global_position = start_position
         move_and_slide()
-
+    
     if not _is_on_floor():
         velocity.y -= gravity * delta * 0.5
+    
+    $CameraHolder/Camera3D.position.z = 1.5 if $"../ThirdPerson".button_pressed else 0.0
+    $CameraHolder.position.y = 1.2 if $"../ThirdPerson".button_pressed else 1.5
