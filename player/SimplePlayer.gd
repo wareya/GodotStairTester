@@ -49,9 +49,6 @@ func handle_friction_and_accel(delta):
 @export var skipping_hack_distance : float = 0.08
 @export var step_height = 0.5
 
-# used to smooth out the camera when climbing stairs
-var camera_offset_y = 0.0
-
 func check_and_attempt_skipping_hack():
     # try again with a certain minimum horizontal step distance if there was no wall collision and the wall trace was close
     if do_skipping_hack and !found_stairs and is_on_floor() and !wall_collision and (wall_test_travel * Vector3(1,0,1)).length() < skipping_hack_distance:
@@ -127,15 +124,16 @@ func move_and_climb_stairs(delta):
     return found_stairs
 
 func _process(delta: float) -> void:
+    # for controller camera control
     handle_stick_input(delta)
     
     if Input.is_action_pressed("ui_accept") and is_on_floor():
         velocity.y = jumpvel
         floor_snap_length = 0.0
     elif is_on_floor():
-        floor_snap_length = 0.5
+        floor_snap_length = step_height
     
-    var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+    var input_dir := Input.get_vector("left", "right", "forward", "backward") + Input.get_vector("stick_left", "stick_right", "stick_forward", "stick_backward")
     wish_dir = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, $CameraHolder.global_rotation.y)
     if wish_dir.length_squared() > 1.0:
         wish_dir = wish_dir.normalized()
@@ -181,6 +179,8 @@ func _unhandled_input(event: InputEvent) -> void:
             Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 @export var third_person = false
+# used to smooth out the camera when climbing stairs
+var camera_offset_y = 0.0
 func handle_camera_adjustment(start_position, delta):
     # first/third-person adjustment
     $CameraHolder.position.y = 1.2 if third_person else 1.5
