@@ -133,22 +133,22 @@ func _process(delta: float) -> void:
                 found_stairs = true
     
     # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
+    # if we found stairs, climb up them
     if found_stairs:
-        # if we found stairs, climb up them
+        # try to apply the remaining travel distance if we hit a wall
         if wall_collision and wall_test_travel.length_squared() > 0.0:
-            # try to apply the remaining travel distance if we hit a wall
             var remaining_factor = wall_collision.get_remainder().length() / wall_test_travel.length()
             velocity *= remaining_factor
             move_and_slide()
             velocity /= remaining_factor
+        # even if we didn't hit a wall, we still need to use move_and_slide to make is_on_floor() work properly
         else:
-            # even if we didn't hit a wall, we still need to use move_and_slide to make is_on_floor() work properly
             var old_vel = velocity
             velocity = Vector3()
             move_and_slide()
             velocity = old_vel
+    # no stairs, do "normal" non-stairs movement
     else:
-        # no stairs, do "normal" non-stairs movement
         global_position = start_position
         move_and_slide()
     
