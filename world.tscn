@@ -1,7 +1,8 @@
-[gd_scene load_steps=19 format=3 uid="uid://byikl3mg1l0io"]
+[gd_scene load_steps=20 format=3 uid="uid://byikl3mg1l0io"]
 
 [ext_resource type="PackedScene" uid="uid://b5rmjajnlo22w" path="res://StairsTestScene.tscn" id="1_0ystr"]
 [ext_resource type="Script" path="res://player/SimplePlayer.gd" id="1_2s7tp"]
+[ext_resource type="Script" path="res://world.gd" id="1_mkwvl"]
 [ext_resource type="Script" path="res://ResetButton.gd" id="3_2mp0y"]
 [ext_resource type="Script" path="res://CollisionBoxPicker.gd" id="4_1xxhe"]
 [ext_resource type="Script" path="res://StairsSetting.gd" id="4_05imk"]
@@ -28,7 +29,7 @@ size = Vector3(0.625, 1.75, 0.625)
 points = PackedVector3Array(-0.312, 0.6, -0.312, -0.312, 0.6, 0.313, 0.313, 0.6, -0.312, 0.313, 0.6, 0.313, 0, 0.875, 0, 0, -0.875, 0, -0.312, -0.6, -0.312, -0.312, -0.6, 0.312, 0.312, -0.6, -0.312, 0.312, -0.6, 0.312)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mkkux"]
-points = PackedVector3Array(0, 0.6, -0.312, 0, 0.6, 0.313, -0.312, 0.6, 0, 0.313, 0.6, 0, 0, 0.875, 0, 0, -0.875, 0, 0, -0.6, -0.312, 0, -0.6, 0.312, -0.312, -0.6, 0, 0.312, -0.6, 0, 0.221, 0.6, 0.221, 0.221, 0.6, -0.221, -0.221, 0.6, 0.221, -0.221, 0.6, -0.221, 0.221, -0.6, 0.221, 0.221, -0.6, -0.221, -0.221, -0.6, 0.221, -0.221, -0.6, -0.221)
+points = PackedVector3Array(0, 0.6, -0.312, 0, 0.6, 0.313, -0.312, 0.6, 0, 0.313, 0.6, 0, 0, 0.875, 0, 0, -0.875, 0, 0, -0.6, -0.312, 0, -0.6, 0.313, -0.312, -0.6, 0, 0.313, -0.6, 0, 0.221, 0.6, 0.221, 0.221, 0.6, -0.221, -0.221, 0.6, 0.221, -0.221, 0.6, -0.221, 0.221, -0.6, 0.221, 0.221, -0.6, -0.221, -0.221, -0.6, 0.221, -0.221, -0.6, -0.221)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_eu7ao"]
 margin = 0.0
@@ -79,6 +80,7 @@ shader_parameter/scale = 1.0
 size = Vector2(0.1, 0.1)
 
 [node name="World" type="Node3D"]
+script = ExtResource("1_mkwvl")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
@@ -95,11 +97,13 @@ script = ExtResource("1_2s7tp")
 
 [node name="AABB" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+visible = false
 shape = SubResource("BoxShape3D_x1wx2")
 disabled = true
 
 [node name="Gem" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+visible = false
 shape = SubResource("ConvexPolygonShape3D_kujgx")
 disabled = true
 
@@ -110,11 +114,13 @@ disabled = true
 
 [node name="Cylinder" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+visible = false
 shape = SubResource("CylinderShape3D_eu7ao")
 disabled = true
 
 [node name="Capsule" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+visible = false
 shape = SubResource("CapsuleShape3D_oswhk")
 
 [node name="CameraHolder" type="Node3D" parent="CharacterBody3D"]

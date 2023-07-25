@@ -1,12 +1,5 @@
 extends CharacterBody3D
 
-func _ready() -> void:
-    $"../CollisionBox".add_item("AABB")
-    $"../CollisionBox".add_item("Cylinder")
-    $"../CollisionBox".add_item("Capsule")
-    $"../CollisionBox".add_item("Gem")
-    $"../CollisionBox".add_item("Octogem")
-
 const mouse_sens = 0.022 * 3.0
 
 const unit_conversion = 64.0
@@ -19,6 +12,15 @@ const max_speed_air = 320.0/unit_conversion
 
 const accel = 15.0
 const accel_air = 2.0
+
+func handle_stick_input(delta):
+    var camera_dir := Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down")
+    var tilt = camera_dir.length()
+    var acceleration = pow(4.0, min(tilt, 1.0) - 1.0)
+    camera_dir *= acceleration
+    $CameraHolder.rotation_degrees.y -= camera_dir.x * 240.0 * delta
+    $CameraHolder.rotation_degrees.x -= camera_dir.y * 240.0 * delta
+    $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
 
 func _input(event: InputEvent) -> void:
     if event is InputEventMouseMotion:
@@ -50,7 +52,8 @@ func handle_friction(delta):
 func handle_accel(delta):
     if wish_dir != Vector3():
         var actual_maxspeed = max_speed if is_on_floor() else max_speed_air
-        var actual_accel = (accel if is_on_floor() else accel_air) * actual_maxspeed
+        var wish_dir_length = wish_dir.length()
+        var actual_accel = (accel if is_on_floor() else accel_air) * actual_maxspeed * wish_dir_length
         
         var floor_velocity = Vector3(velocity.x, 0, velocity.z)
         var speed_in_wish_dir = floor_velocity.dot(wish_dir.normalized())
@@ -73,22 +76,22 @@ func handle_friction_and_accel(delta):
 var camera_offset_y = 0.0
 
 func check_and_attempt_skipping_hack():
-        # try again with a certain minimum horizontal step distance if there was no wall collision and the wall trace was close
-        if do_skipping_hack and !found_stairs and is_on_floor() and !wall_collision and (wall_test_travel * Vector3(1,0,1)).length() < skipping_hack_distance:
-            # go back to where we were at the end of the ceiling collision test
-            global_position = ceiling_position
-            # calculate a new path for the wall test: horizontal only, length of our fallback distance
-            var floor_velocity = Vector3(velocity.x, 0.0, velocity.z)
-            var factor = skipping_hack_distance / floor_velocity.length()
-            
-            # step 2, skipping hack version
-            wall_test_travel = floor_velocity * factor
-            wall_collision = move_and_collide(wall_test_travel, false, 0.0)
-            
-            # step 3, skipping hack version
-            floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
-            if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
-                found_stairs = true
+    # try again with a certain minimum horizontal step distance if there was no wall collision and the wall trace was close
+    if do_skipping_hack and !found_stairs and is_on_floor() and !wall_collision and (wall_test_travel * Vector3(1,0,1)).length() < skipping_hack_distance:
+        # go back to where we were at the end of the ceiling collision test
+        global_position = ceiling_position
+        # calculate a new path for the wall test: horizontal only, length of our fallback distance
+        var floor_velocity = Vector3(velocity.x, 0.0, velocity.z)
+        var factor = skipping_hack_distance / floor_velocity.length()
+        
+        # step 2, skipping hack version
+        wall_test_travel = floor_velocity * factor
+        wall_collision = move_and_collide(wall_test_travel, false, 0.0)
+        
+        # step 3, skipping hack version
+        floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
+        if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
+            found_stairs = true
 
 var found_stairs = false
 var wall_test_travel = Vector3()
@@ -147,27 +150,15 @@ func move_and_climb_stairs(delta):
     return found_stairs
 
 func _process(delta: float) -> void:
-    if $"../StairsSetting":
-        do_stairs = $"../StairsSetting".button_pressed
-    if $"../SkippingSetting":
-        do_skipping_hack = $"../SkippingSetting".button_pressed
+    handle_stick_input(delta)
     
-    $"../FPS".text = "framerate: " + str(Engine.get_frames_per_second())
-    $"../Vel".text = str(velocity)
-    
-    $AABB.disabled = $"../CollisionBox".selected != 0
-    $Gem.disabled = $"../CollisionBox".selected != 3
-    $Octogem.disabled = $"../CollisionBox".selected != 4
-    $Cylinder.disabled = $"../CollisionBox".selected != 1
-    $Capsule.disabled = $"../CollisionBox".selected != 2
-    
-    if Input.is_action_pressed("jump") and is_on_floor():
+    if Input.is_action_pressed("ui_accept") and is_on_floor():
         velocity.y = jumpvel
         floor_snap_length = 0.0
     elif is_on_floor():
         floor_snap_length = 0.5
     
-    var input_dir := Input.get_vector("left", "right", "forward", "backward")
+    var input_dir := Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
     wish_dir = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, $CameraHolder.global_rotation.y)
     if wish_dir.length_squared() > 1.0:
         wish_dir = wish_dir.normalized()
@@ -189,10 +180,11 @@ func _process(delta: float) -> void:
     
     add_collision_debug_visualizer(delta)
 
+@export var third_person = false
 func handle_camera_smoothing(start_position, delta):
     # first/third-person adjustment
-    $CameraHolder.position.y = 1.2 if $"../ThirdPerson".button_pressed else 1.5
-    $CameraHolder/Camera3D.position.z = 1.5 if $"../ThirdPerson".button_pressed else 0.0
+    $CameraHolder.position.y = 1.2 if third_person else 1.5
+    $CameraHolder/Camera3D.position.z = 1.5 if third_person else 0.0
     
     if do_camera_smoothing:
         # NOT NEEDED: camera smoothing
@@ -206,6 +198,7 @@ func handle_camera_smoothing(start_position, delta):
         $CameraHolder/Camera3D.position.y = 0.0
         $CameraHolder/Camera3D.position.x = 0.0
         $CameraHolder/Camera3D.global_position.y += camera_offset_y
+
 
 static func make_debug_mesh(color : Color):
     var texture = GradientTexture2D.new()
@@ -240,7 +233,6 @@ class Visualizer extends MeshInstance3D:
     func _process(delta):
         life -= delta
         if life < 0.0:
-            #print("dying at... ", global_position)
             queue_free()
         else:
             transparency = 1.0 - life/5.0
@@ -255,22 +247,16 @@ func add_collision_debug_visualizer(delta):
     if _debug_timer < 0.0:
         _debug_timer = 0.0
     
-    if true:#is_on_floor() or is_on_wall():
-        #var temp = global_position
-        #move_and_collide(Vector3.UP * step_height)
-        #move_and_collide(wish_dir * 0.04)
-        #var floor_collision = move_and_collide(Vector3.DOWN*(step_height + 0.04), true)
-        #global_position = temp
-        var collision = floor_collision if floor_collision else wall_collision
-        if collision:
-            var normal = collision.get_normal(0)
-            if normal.y > 0.1 and normal.y < 0.999:
-                var visualizer = Visualizer.new()
-                if acos(normal.y) < floor_max_angle:
-                    visualizer.mesh = _collision_debug_mesh
-                else:
-                    visualizer.mesh = _collision_debug_mesh_unwalkable
-                get_tree().current_scene.add_child(visualizer)
-                visualizer.look_at_from_position(Vector3(), normal)
-                visualizer.global_position = collision.get_position(0)
-                visualizer.global_position += normal*0.01
+    var collision = floor_collision if floor_collision else wall_collision
+    if collision:
+        var normal = collision.get_normal(0)
+        if normal.y > 0.1 and normal.y < 0.999:
+            var visualizer = Visualizer.new()
+            if acos(normal.y) < floor_max_angle:
+                visualizer.mesh = _collision_debug_mesh
+            else:
+                visualizer.mesh = _collision_debug_mesh_unwalkable
+            get_tree().current_scene.add_child(visualizer)
+            visualizer.look_at_from_position(Vector3(), normal)
+            visualizer.global_position = collision.get_position(0)
+            visualizer.global_position += normal*0.01
