@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://byikl3mg1l0io"]
+[gd_scene load_steps=19 format=3 uid="uid://byikl3mg1l0io"]
 
 [ext_resource type="PackedScene" uid="uid://b5rmjajnlo22w" path="res://StairsTestScene.tscn" id="1_0ystr"]
 [ext_resource type="Script" path="res://player/SimplePlayer.gd" id="1_2s7tp"]
@@ -74,6 +74,9 @@ shader = SubResource("Shader_wk5yv")
 shader_parameter/albedo = Color(0.501961, 0.501961, 0.501961, 1)
 shader_parameter/pixels_size = 32.0
 shader_parameter/scale = 1.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_48u70"]
+size = Vector2(0.1, 0.1)
 
 [node name="World" type="Node3D"]
 
@@ -187,6 +190,9 @@ offset_right = 185.0
 offset_bottom = 235.0
 text = "Third Person"
 script = ExtResource("6_im2oe")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("QuadMesh_48u70")
 
 [connection signal="pressed" from="ResetButton" to="ResetButton" method="_on_pressed"]
 [connection signal="pressed" from="StairsSetting" to="StairsSetting" method="_on_pressed"]

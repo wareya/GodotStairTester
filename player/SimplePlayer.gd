@@ -67,9 +67,84 @@ func handle_friction_and_accel(delta):
 @export var do_stairs : bool = true
 @export var do_skipping_hack : bool = false
 @export var skipping_hack_distance : float = 0.08
+@export var step_height = 0.5
 
 # used to smooth out the camera when climbing stairs
 var camera_offset_y = 0.0
+
+func check_and_attempt_skipping_hack():
+        # try again with a certain minimum horizontal step distance if there was no wall collision and the wall trace was close
+        if do_skipping_hack and !found_stairs and is_on_floor() and !wall_collision and (wall_test_travel * Vector3(1,0,1)).length() < skipping_hack_distance:
+            # go back to where we were at the end of the ceiling collision test
+            global_position = ceiling_position
+            # calculate a new path for the wall test: horizontal only, length of our fallback distance
+            var floor_velocity = Vector3(velocity.x, 0.0, velocity.z)
+            var factor = skipping_hack_distance / floor_velocity.length()
+            
+            # step 2, skipping hack version
+            wall_test_travel = floor_velocity * factor
+            wall_collision = move_and_collide(wall_test_travel, false, 0.0)
+            
+            # step 3, skipping hack version
+            floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
+            if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
+                found_stairs = true
+
+var found_stairs = false
+var wall_test_travel = Vector3()
+var ceiling_position = Vector3()
+var ceiling_travel_distance = Vector3()
+var ceiling_collision = null
+var wall_collision = null
+var floor_collision = null
+
+func move_and_climb_stairs(delta):
+    var start_position = global_position
+    found_stairs = false
+    wall_test_travel = Vector3()
+    ceiling_position = Vector3()
+    ceiling_travel_distance = Vector3()
+    ceiling_collision = null
+    wall_collision = null
+    floor_collision = null
+    # check for simple stairs; three steps
+    if do_stairs and velocity.x != 0.0 and velocity.z != 0.0:
+        # step 1: upwards trace
+        ceiling_collision = move_and_collide(step_height * Vector3.UP)
+        ceiling_travel_distance = step_height if not ceiling_collision else abs(ceiling_collision.get_travel().y)
+        ceiling_position = global_position
+        # step 2: "check if there's a wall" trace
+        wall_test_travel = velocity * delta
+        wall_collision = move_and_collide(wall_test_travel)
+        # step 3: downwards trace
+        floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
+        if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
+            found_stairs = true
+        
+        # NOTE: NOT NECESSARY
+        # skip over small sloped walls if we failed to find a stair and the skipping hack is enabled
+        check_and_attempt_skipping_hack()
+    
+    # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
+    # if we found stairs, climb up them
+    if found_stairs:
+        # try to apply the remaining travel distance if we hit a wall
+        if wall_collision and wall_test_travel.length_squared() > 0.0:
+            var remaining_factor = wall_collision.get_remainder().length() / wall_test_travel.length()
+            velocity *= remaining_factor
+            move_and_slide()
+            velocity /= remaining_factor
+        # even if we didn't hit a wall, we still need to use move_and_slide to make is_on_floor() work properly
+        else:
+            var old_vel = velocity
+            velocity = Vector3()
+            move_and_slide()
+            velocity = old_vel
+    # no stairs, do "normal" non-stairs movement
+    else:
+        global_position = start_position
+        move_and_slide()
+    return found_stairs
 
 func _process(delta: float) -> void:
     if $"../StairsSetting":
@@ -99,70 +174,22 @@ func _process(delta: float) -> void:
     
     handle_friction_and_accel(delta)
     
-    var step_height = 0.5
-    
     if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
-    # check for simple stairs; three steps
     var start_position = global_position
-    var found_stairs = false
-    var wall_test_travel = null
-    var wall_collision = null
-    if do_stairs and velocity.x != 0.0 and velocity.z != 0.0:
-        # step 1: upwards trace
-        var ceiling_collision = move_and_collide(step_height * Vector3.UP)
-        var ceiling_travel_distance = step_height if not ceiling_collision else abs(ceiling_collision.get_travel().y)
-        var ceiling_position = global_position
-        # step 2: "check if there's a wall" trace
-        wall_test_travel = velocity * delta
-        wall_collision = move_and_collide(wall_test_travel)
-        # step 3: downwards trace
-        var floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
-        if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
-            found_stairs = true
-        
-        # NOTE: NOT NECESSARY
-        # try again with a certain minimum horizontal step distance if there was no wall collision and the wall trace was close
-        if do_skipping_hack and !found_stairs and is_on_floor() and !wall_collision and (wall_test_travel * Vector3(1,0,1)).length() < skipping_hack_distance:
-            # go back to where we were at the end of the ceiling collision test
-            global_position = ceiling_position
-            # calculate a new path for the wall test: horizontal only, length of our fallback distance
-            var floor_velocity = Vector3(velocity.x, 0.0, velocity.z)
-            var factor = skipping_hack_distance / floor_velocity.length()
-            
-            # step 2, skipping hack version
-            wall_test_travel = floor_velocity * factor
-            wall_collision = move_and_collide(wall_test_travel, false, 0.0)
-            
-            # step 3, skipping hack version
-            floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
-            if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
-                found_stairs = true
     
-    # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
-    # if we found stairs, climb up them
-    if found_stairs:
-        # try to apply the remaining travel distance if we hit a wall
-        if wall_collision and wall_test_travel.length_squared() > 0.0:
-            var remaining_factor = wall_collision.get_remainder().length() / wall_test_travel.length()
-            velocity *= remaining_factor
-            move_and_slide()
-            velocity /= remaining_factor
-        # even if we didn't hit a wall, we still need to use move_and_slide to make is_on_floor() work properly
-        else:
-            var old_vel = velocity
-            velocity = Vector3()
-            move_and_slide()
-            velocity = old_vel
-    # no stairs, do "normal" non-stairs movement
-    else:
-        global_position = start_position
-        move_and_slide()
+    # CHANGE ME: replace this with your own movement-and-stair-climbing code
+    var found_stairs = move_and_climb_stairs(delta)
     
     if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
+    handle_camera_smoothing(start_position, delta)
+    
+    add_collision_debug_visualizer(delta)
+
+func handle_camera_smoothing(start_position, delta):
     # first/third-person adjustment
     $CameraHolder.position.y = 1.2 if $"../ThirdPerson".button_pressed else 1.5
     $CameraHolder/Camera3D.position.z = 1.5 if $"../ThirdPerson".button_pressed else 0.0
@@ -179,3 +206,71 @@ func _process(delta: float) -> void:
         $CameraHolder/Camera3D.position.y = 0.0
         $CameraHolder/Camera3D.position.x = 0.0
         $CameraHolder/Camera3D.global_position.y += camera_offset_y
+
+static func make_debug_mesh(color : Color):
+    var texture = GradientTexture2D.new()
+    texture.fill_from = Vector2(0.5, 0.5)
+    texture.fill_to = Vector2(0.5, 1.0)
+    texture.fill = GradientTexture2D.FILL_RADIAL
+    texture.gradient = Gradient.new()
+    texture.gradient.add_point(0.0, Color(1.0, 1.0, 1.0, 1.0))
+    texture.gradient.add_point(1.0, Color(1.0, 1.0, 1.0, 0.0))
+    texture.gradient.remove_point(0)
+    texture.gradient.remove_point(0)
+    texture.gradient.interpolation_mode = Gradient.GRADIENT_INTERPOLATE_CUBIC
+    
+    var mat = StandardMaterial3D.new()
+    mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    mat.albedo_color = color
+    mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+    mat.albedo_texture = texture
+    
+    var mesh = QuadMesh.new()
+    mesh.size = Vector2(0.25, 0.25)
+    mesh.material = mat
+    
+    return mesh
+
+@onready var _collision_debug_mesh = make_debug_mesh(Color(1.0, 0.75, 0.5, 0.5))
+@onready var _collision_debug_mesh_unwalkable = make_debug_mesh(Color(1.0, 0.0, 0.0, 0.5))
+
+class Visualizer extends MeshInstance3D:
+    var life = 5.0
+    func _process(delta):
+        life -= delta
+        if life < 0.0:
+            #print("dying at... ", global_position)
+            queue_free()
+        else:
+            transparency = 1.0 - life/5.0
+
+var _debug_timer_max = 0.016
+var _debug_timer = _debug_timer_max
+func add_collision_debug_visualizer(delta):
+    _debug_timer -= delta
+    if _debug_timer > 0.0:
+        return
+    _debug_timer += _debug_timer_max
+    if _debug_timer < 0.0:
+        _debug_timer = 0.0
+    
+    if true:#is_on_floor() or is_on_wall():
+        #var temp = global_position
+        #move_and_collide(Vector3.UP * step_height)
+        #move_and_collide(wish_dir * 0.04)
+        #var floor_collision = move_and_collide(Vector3.DOWN*(step_height + 0.04), true)
+        #global_position = temp
+        var collision = floor_collision if floor_collision else wall_collision
+        if collision:
+            var normal = collision.get_normal(0)
+            if normal.y > 0.1 and normal.y < 0.999:
+                var visualizer = Visualizer.new()
+                if acos(normal.y) < floor_max_angle:
+                    visualizer.mesh = _collision_debug_mesh
+                else:
+                    visualizer.mesh = _collision_debug_mesh_unwalkable
+                get_tree().current_scene.add_child(visualizer)
+                visualizer.look_at_from_position(Vector3(), normal)
+                visualizer.global_position = collision.get_position(0)
+                visualizer.global_position += normal*0.01
