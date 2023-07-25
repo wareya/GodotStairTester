@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://byikl3mg1l0io"]
+[gd_scene load_steps=16 format=3 uid="uid://byikl3mg1l0io"]
 
 [ext_resource type="PackedScene" uid="uid://b5rmjajnlo22w" path="res://StairsTestScene.tscn" id="1_0ystr"]
 [ext_resource type="Script" path="res://player/SimplePlayer.gd" id="1_2s7tp"]
@@ -32,6 +32,42 @@ radius = 0.313
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_oswhk"]
 radius = 0.313
 height = 1.75
+
+[sub_resource type="TextMesh" id="TextMesh_t6kdy"]
+text = "+"
+font_size = 22
+pixel_size = 0.05
+
+[sub_resource type="Shader" id="Shader_wk5yv"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.1.stable's StandardMaterial3D.
+
+shader_type spatial;
+render_mode blend_mix,cull_back,unshaded,shadows_disabled,skip_vertex_transform;
+uniform vec4 albedo : source_color;
+
+
+uniform float pixels_size = 32.0;
+uniform float scale = 1.0;
+
+void vertex() {
+    float near = 0.05;
+    float fov_scale = 2.0 / PROJECTION_MATRIX[1][1];
+    VERTEX *= fov_scale / VIEWPORT_SIZE.y * pixels_size * scale;
+    VERTEX.xyz = vec3(-VERTEX.x, -VERTEX.y, -1.0)*near;
+}
+
+void fragment() {
+	ALBEDO = albedo.rgb;
+	ALPHA = 2.0;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_05pxi"]
+render_priority = 0
+shader = SubResource("Shader_wk5yv")
+shader_parameter/albedo = Color(0.501961, 0.501961, 0.501961, 1)
+shader_parameter/pixels_size = 32.0
+shader_parameter/scale = 1.0
 
 [node name="World" type="Node3D"]
 
@@ -67,6 +103,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="Camera3D" type="Camera3D" parent="CharacterBody3D/CameraHolder"]
 fov = 90.0
+
+[node name="Crosshair" type="MeshInstance3D" parent="CharacterBody3D/CameraHolder/Camera3D"]
+extra_cull_margin = 16384.0
+mesh = SubResource("TextMesh_t6kdy")
+skeleton = NodePath("../../../..")
+surface_material_override/0 = SubResource("ShaderMaterial_05pxi")
 
 [node name="Level" parent="." instance=ExtResource("1_0ystr")]
 
