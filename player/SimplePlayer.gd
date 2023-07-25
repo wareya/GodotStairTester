@@ -4,6 +4,8 @@ func _ready() -> void:
     $"../CollisionBox".add_item("AABB")
     $"../CollisionBox".add_item("Cylinder")
     $"../CollisionBox".add_item("Capsule")
+    $"../CollisionBox".add_item("Gem")
+    $"../CollisionBox".add_item("Octogem")
 
 const mouse_sens = 0.022 * 3.0
 
@@ -61,9 +63,13 @@ func handle_friction_and_accel(delta):
     handle_friction(delta)
     handle_accel(delta)
 
+@export var do_camera_smoothing : bool = true
 @export var do_stairs : bool = true
 @export var do_skipping_hack : bool = false
 @export var skipping_hack_distance : float = 0.08
+
+# used to smooth out the camera when climbing stairs
+var camera_offset_y = 0.0
 
 func _process(delta: float) -> void:
     if $"../StairsSetting":
@@ -75,6 +81,8 @@ func _process(delta: float) -> void:
     $"../Vel".text = str(velocity)
     
     $AABB.disabled = $"../CollisionBox".selected != 0
+    $Gem.disabled = $"../CollisionBox".selected != 3
+    $Octogem.disabled = $"../CollisionBox".selected != 4
     $Cylinder.disabled = $"../CollisionBox".selected != 1
     $Capsule.disabled = $"../CollisionBox".selected != 2
     
@@ -155,5 +163,19 @@ func _process(delta: float) -> void:
     if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
-    $CameraHolder/Camera3D.position.z = 1.5 if $"../ThirdPerson".button_pressed else 0.0
+    # first/third-person adjustment
     $CameraHolder.position.y = 1.2 if $"../ThirdPerson".button_pressed else 1.5
+    $CameraHolder/Camera3D.position.z = 1.5 if $"../ThirdPerson".button_pressed else 0.0
+    
+    if do_camera_smoothing:
+        # NOT NEEDED: camera smoothing
+        var stair_climb_distance = 0.0
+        if found_stairs:
+            stair_climb_distance = global_position.y - start_position.y
+        camera_offset_y -= stair_climb_distance
+        camera_offset_y = clamp(camera_offset_y, -step_height, step_height)
+        camera_offset_y = move_toward(camera_offset_y, 0.0, delta * 3.0)
+        
+        $CameraHolder/Camera3D.position.y = 0.0
+        $CameraHolder/Camera3D.position.x = 0.0
+        $CameraHolder/Camera3D.global_position.y += camera_offset_y
