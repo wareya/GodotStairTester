@@ -239,6 +239,36 @@ use_collision = true
 size = Vector3(1, 0.25, 0.5)
 material = SubResource("StandardMaterial3D_6j7a6")
 
+[node name="CSGBox3D51" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.125, -5.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D55" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.1875, -5.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D52" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.375, -5.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D53" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.625, -6.25)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
+[node name="CSGBox3D54" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.875, -6.75)
+use_collision = true
+size = Vector3(1, 0.25, 0.5)
+material = SubResource("StandardMaterial3D_6j7a6")
+
 [node name="Label3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.46182, -1)
 pixel_size = 0.0025
@@ -276,6 +306,16 @@ text = "It should be possible to step
 onto the first step, but not
 onto the second, from
 this direction."
+
+[node name="Label3D19" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.90669, 1.46182, -4.98793)
+pixel_size = 0.0025
+text = "It should be possible to step
+onto the first step, but not
+onto the second, from
+this direction.
+Harder version of the one
+in front of it."
 
 [node name="Label3D4" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.47481, 1.46182, -0.977026)

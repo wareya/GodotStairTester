@@ -29,7 +29,7 @@ size = Vector3(0.625, 1.75, 0.625)
 points = PackedVector3Array(-0.312, 0.6, -0.312, -0.312, 0.6, 0.313, 0.313, 0.6, -0.312, 0.313, 0.6, 0.313, 0, 0.875, 0, 0, -0.875, 0, -0.312, -0.6, -0.312, -0.312, -0.6, 0.312, 0.312, -0.6, -0.312, 0.312, -0.6, 0.312)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mkkux"]
-points = PackedVector3Array(0, 0.6, -0.312, 0, 0.6, 0.313, -0.312, 0.6, 0, 0.313, 0.6, 0, 0, 0.875, 0, 0, -0.875, 0, 0, -0.6, -0.312, 0, -0.6, 0.313, -0.312, -0.6, 0, 0.313, -0.6, 0, 0.221, 0.6, 0.221, 0.221, 0.6, -0.221, -0.221, 0.6, 0.221, -0.221, 0.6, -0.221, 0.221, -0.6, 0.221, 0.221, -0.6, -0.221, -0.221, -0.6, 0.221, -0.221, -0.6, -0.221)
+points = PackedVector3Array(0, 0.6, -0.313, 0, 0.6, 0.313, -0.313, 0.6, 0, 0.313, 0.6, 0, 0, 0.875, 0, 0, -0.875, 0, 0, -0.6, -0.313, 0, -0.6, 0.313, -0.313, -0.6, 0, 0.313, -0.6, 0, 0.221, 0.6, 0.221, 0.221, 0.6, -0.221, -0.221, 0.6, 0.221, -0.221, 0.6, -0.221, 0.221, -0.6, 0.221, 0.221, -0.6, -0.221, -0.221, -0.6, 0.221, -0.221, -0.6, -0.221)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_eu7ao"]
 margin = 0.0
@@ -97,7 +97,6 @@ script = ExtResource("1_2s7tp")
 
 [node name="AABB" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
-visible = false
 shape = SubResource("BoxShape3D_x1wx2")
 disabled = true
 
@@ -109,6 +108,7 @@ disabled = true
 
 [node name="Octogem" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.875, 0)
+visible = false
 shape = SubResource("ConvexPolygonShape3D_mkkux")
 disabled = true
 

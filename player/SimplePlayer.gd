@@ -87,7 +87,8 @@ func move_and_climb_stairs(delta):
     # check for simple stairs; three steps
     if do_stairs and velocity.x != 0.0 and velocity.z != 0.0:
         # step 1: upwards trace
-        ceiling_collision = move_and_collide(step_height * Vector3.UP)
+        var up_height = probe_probable_step_height() # NOT NECESSARY. can just be step_height.
+        ceiling_collision = move_and_collide(up_height * Vector3.UP)
         ceiling_travel_distance = step_height if not ceiling_collision else abs(ceiling_collision.get_travel().y)
         ceiling_position = global_position
         # step 2: "check if there's a wall" trace
@@ -122,6 +123,62 @@ func move_and_climb_stairs(delta):
         global_position = start_position
         move_and_slide()
     return found_stairs
+
+func probe_probable_step_height():
+    const hull_height = 1.75
+    const center_offset = 0.875 # edit to match the offset between your origin and the center of your hitbox
+    const hull_width = 0.625 # approximately the full width of your hull
+    
+    var heading = (velocity * Vector3(1, 0, 1)).normalized()
+    
+    var offset = Vector3()
+    var test = move_and_collide(heading * hull_width, true)
+    if test and abs(test.get_normal().y) < 0.8:
+        offset = (test.get_position(0) - test.get_travel() - global_position) * Vector3(1, 0, 1)
+    
+    var raycast = ShapeCast3D.new()
+    var shape = CylinderShape3D.new()
+    shape.radius = hull_width/2.0
+    shape.height = max(0.01, hull_height - step_height*2.0 - 0.1)
+    raycast.shape = shape
+    raycast.max_results = 1
+    add_child(raycast)
+    raycast.collision_mask = collision_mask
+    raycast.position = Vector3(0.0, center_offset, 0.0)
+    if offset != Vector3():
+        raycast.target_position = heading * hull_width * 0.22 + offset
+    else:
+        raycast.target_position = heading * hull_width * 0.72
+    #raycast.force_raycast_update()
+    raycast.force_shapecast_update()
+    if raycast.is_colliding():
+        #raycast.position = raycast.get_collision_point(0)
+        raycast.position = raycast.get_collision_point(0)
+    else:
+        raycast.position += raycast.target_position
+    
+    var up_distance = 50.0
+    raycast.target_position = Vector3(0.0, 50.0, 0.0)
+    #raycast.force_raycast_update()
+    raycast.force_shapecast_update()
+    if raycast.is_colliding():
+        up_distance = raycast.get_collision_point(0).y - raycast.position.y
+    
+    var down_distance = 50.0
+    raycast.target_position = Vector3(0.0, -50.0, 0.0)
+    #raycast.force_raycast_update()
+    raycast.force_shapecast_update()
+    if raycast.is_colliding():
+        down_distance = raycast.position.y - raycast.get_collision_point(0).y
+    
+    raycast.queue_free()
+    
+    if up_distance + down_distance < hull_height:
+        return step_height
+    else:
+        var highest = up_distance - center_offset
+        var lowest = center_offset - down_distance
+        return clamp(highest/2.0 + lowest/2.0, 0.0, step_height)
 
 func _process(delta: float) -> void:
     # for controller camera control
