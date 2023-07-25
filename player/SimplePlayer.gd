@@ -13,29 +13,6 @@ const max_speed_air = 320.0/unit_conversion
 const accel = 15.0
 const accel_air = 2.0
 
-func handle_stick_input(delta):
-    var camera_dir := Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down")
-    var tilt = camera_dir.length()
-    var acceleration = pow(4.0, min(tilt, 1.0) - 1.0)
-    camera_dir *= acceleration
-    $CameraHolder.rotation_degrees.y -= camera_dir.x * 240.0 * delta
-    $CameraHolder.rotation_degrees.x -= camera_dir.y * 240.0 * delta
-    $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
-
-func _input(event: InputEvent) -> void:
-    if event is InputEventMouseMotion:
-        if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-            $CameraHolder.rotation_degrees.y -= event.relative.x * mouse_sens
-            $CameraHolder.rotation_degrees.x -= event.relative.y * mouse_sens
-            $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
-
-func _unhandled_input(event: InputEvent) -> void:
-    if event.is_action_pressed("m1") or event.is_action_pressed("m2"):
-        if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-            Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-        else:
-            Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
 var wish_dir = Vector3()
 var friction = 6.0
 
@@ -176,12 +153,35 @@ func _process(delta: float) -> void:
     if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
-    handle_camera_smoothing(start_position, delta)
+    handle_camera_adjustment(start_position, delta)
     
     add_collision_debug_visualizer(delta)
 
+func handle_stick_input(delta):
+    var camera_dir := Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down")
+    var tilt = camera_dir.length()
+    var acceleration = pow(4.0, min(tilt, 1.0) - 1.0)
+    camera_dir *= acceleration
+    $CameraHolder.rotation_degrees.y -= camera_dir.x * 240.0 * delta
+    $CameraHolder.rotation_degrees.x -= camera_dir.y * 240.0 * delta
+    $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
+
+func _input(event: InputEvent) -> void:
+    if event is InputEventMouseMotion:
+        if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+            $CameraHolder.rotation_degrees.y -= event.relative.x * mouse_sens
+            $CameraHolder.rotation_degrees.x -= event.relative.y * mouse_sens
+            $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
+
+func _unhandled_input(event: InputEvent) -> void:
+    if event.is_action_pressed("m1") or event.is_action_pressed("m2"):
+        if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+            Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+        else:
+            Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
 @export var third_person = false
-func handle_camera_smoothing(start_position, delta):
+func handle_camera_adjustment(start_position, delta):
     # first/third-person adjustment
     $CameraHolder.position.y = 1.2 if third_person else 1.5
     $CameraHolder/Camera3D.position.z = 1.5 if third_person else 0.0
