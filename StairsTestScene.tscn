@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://b5rmjajnlo22w"]
+[gd_scene load_steps=14 format=3 uid="uid://b5rmjajnlo22w"]
 
 [ext_resource type="Texture2D" uid="uid://8jjphj6non1s" path="res://art/blockmesh texture darkgray.png" id="1_x707m"]
 [ext_resource type="Texture2D" uid="uid://blejfycf2xpm7" path="res://art/blockmesh texture blue.png" id="2_x5sg2"]
@@ -34,6 +34,28 @@ uv1_world_triplanar = true
 texture_filter = 5
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ihnv6"]
+albedo_texture = ExtResource("5_73yqw")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ly0nc"]
+albedo_color = Color(0.447059, 0.447059, 0.447059, 1)
+albedo_texture = ExtResource("3_35qmt")
+uv1_triplanar = true
+uv1_triplanar_sharpness = 150.0
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6qc48"]
+albedo_color = Color(0.27451, 0.27451, 0.27451, 1)
+albedo_texture = ExtResource("5_73yqw")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j7qiy"]
+albedo_color = Color(0.27451, 0.27451, 0.27451, 1)
 albedo_texture = ExtResource("5_73yqw")
 uv1_triplanar = true
 uv1_world_triplanar = true
@@ -226,13 +248,15 @@ this entire staircase"
 [node name="Label3D10" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.893967, 1.375)
 pixel_size = 0.0025
-text = "Assuming the right collision shape size,
-everything on this map should work
-roughly the same with both AABB
-and cylinder character collision
-shapes. Capsules won't test properly
-with the specific sizing here, but
-tighter variations would test properly.
+text = "Assuming the right collision shape size, and a
+perfect stair-stepping algorithm, everything on
+this map should work with both AABB
+and cylinder character collision shapes.
+
+Capsules won't work without a capsule-specific
+algorithm; the sloped part at the bottom of
+a capsule acts like a sloped wall when it touches
+the edge of a step, making it impossible to climb.
 
 AABB dimensions: 0.625, 1.75, 0.625
 (full extents, not half extents)"
@@ -260,9 +284,80 @@ text = "It *SHOULD* be possible
 to step onto the green
 ramp from this direction,
 without being forced
-to jump,
-even with an AABB
-collision shape"
+to jump, even with
+an AABB collision shape.
+Cylinders might require
+a hack to skip over the
+part of their bottom that
+forms a 'sloped wall' with
+the ramp edge."
+
+[node name="CSGBox3D42" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.5, 0, 0.866025, 0, 1, 0, -0.866025, 0, -0.5, 7.86785, 0, -6.55866)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D43" type="CSGBox3D" parent="."]
+transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 6.91032, 1.125, -5.71716)
+use_collision = true
+size = Vector3(1, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="CSGBox3D44" type="CSGBox3D" parent="."]
+transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 6.03532, 1.125, -7.2327)
+use_collision = true
+size = Vector3(0.5, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="Label3D16" type="Label3D" parent="."]
+transform = Transform3D(0.5, 0, -0.866025, 0, 1, 0, 0.866025, 0, 0.5, 6.16132, 1.46182, -6.46851)
+pixel_size = 0.0025
+text = "It *SHOULD* be possible
+to step onto the green
+ramp from this direction,
+without being forced
+to jump, even with
+an AABB collision shape.
+Cylinders might require
+a hack to skip over the
+part of their bottom that
+forms a 'sloped wall' with
+the ramp edge."
+
+[node name="CSGBox3D45" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.258819, 0, 0.965926, 0, 1, 0, -0.965926, 0, -0.258819, 11.8462, 0, -6.26552)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_ly0nc")
+
+[node name="CSGBox3D46" type="CSGBox3D" parent="."]
+transform = Transform3D(0.258819, 0, -0.965926, 0, 1, 0, 0.965926, 0, 0.258819, 10.7035, 1.125, -5.70051)
+use_collision = true
+size = Vector3(1, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_6qc48")
+
+[node name="CSGBox3D47" type="CSGBox3D" parent="."]
+transform = Transform3D(0.258819, 0, -0.965926, 0, 1, 0, 0.965926, 0, 0.258819, 10.2506, 1.125, -7.39088)
+use_collision = true
+size = Vector3(0.5, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_j7qiy")
+
+[node name="Label3D17" type="Label3D" parent="."]
+transform = Transform3D(0.258819, 0, -0.965926, 0, 1, 0, 0.965926, 0, 0.258819, 10.1745, 1.46182, -6.62012)
+pixel_size = 0.0025
+text = "Unless you've applied a hack
+to skip over small sloped walls,
+It should NOT be possible
+to step onto the ramp
+from thie direction with
+an AABB collision
+hull. The bottom edge
+of the AABB should form
+a sloped wall collision
+surface with the ramp
+edge, preventing
+stair-stepping."
 
 [node name="CSGBox3D33" type="CSGPolygon3D" parent="."]
 transform = Transform3D(-0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, -0.707107, 11.8129, 0, -1.84742)
@@ -289,9 +384,79 @@ text = "It *SHOULD* be possible
 to step onto the green
 ramp from this direction,
 without being forced
-to jump,
-even with an AABB
-collision shape"
+to jump, even with
+an AABB collision shape.
+Cylinders might require
+a hack to skip over the
+part of their bottom that
+forms a 'sloped wall' with
+the ramp edge."
+
+[node name="CSGBox3D36" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.965926, 0, 0.258819, 0, 1, 0, -0.258819, 0, -0.965926, 15.4931, 0, -2.3347)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D37" type="CSGBox3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 15.411, 1.125, -1.06259)
+use_collision = true
+size = Vector3(1, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="CSGBox3D38" type="CSGBox3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 13.7206, 1.125, -1.5155)
+use_collision = true
+size = Vector3(0.5, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="Label3D14" type="Label3D" parent="."]
+transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 14.3501, 1.46182, -1.06422)
+pixel_size = 0.0025
+text = "It *SHOULD* be possible
+to step onto the green
+ramp from this direction,
+without being forced
+to jump, even with
+an AABB collision shape.
+Cylinders might require
+a hack to skip over the
+part of their bottom that
+forms a 'sloped wall' with
+the ramp edge."
+
+[node name="CSGBox3D39" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.866026, 0, 0.5, 0, 1, 0, -0.5, 0, -0.866026, 19.6851, 0, -2.11211)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.9375, -1, 1, 1, 0, 1, -0.0625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="CSGBox3D40" type="CSGBox3D" parent="."]
+transform = Transform3D(0.866026, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866026, 19.2766, 1.125, -0.904582)
+use_collision = true
+size = Vector3(1, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="CSGBox3D41" type="CSGBox3D" parent="."]
+transform = Transform3D(0.866026, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866026, 17.761, 1.125, -1.77957)
+use_collision = true
+size = Vector3(0.5, 3.5, 0.5)
+material = SubResource("StandardMaterial3D_ihnv6")
+
+[node name="Label3D15" type="Label3D" parent="."]
+transform = Transform3D(0.866026, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866026, 18.2522, 1.46182, -1.18075)
+pixel_size = 0.0025
+text = "It *SHOULD* be possible
+to step onto the green
+ramp from this direction,
+without being forced
+to jump, even with
+an AABB collision shape.
+Cylinders might require
+a hack to skip over the
+part of their bottom that
+forms a 'sloped wall' with
+the ramp edge."
 
 [node name="Label3D5" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.12485, 1.46182, -0.977026)
@@ -324,14 +489,14 @@ pixel_size = 0.0025
 text = "glitch testing"
 
 [node name="CSGBox3D29" type="CSGPolygon3D" parent="."]
-transform = Transform3D(-0.707107, -0.707107, -6.18172e-08, -4.37114e-08, -4.37114e-08, 1, -0.707107, 0.707107, -7.10543e-15, -13.6255, 3, -2.12289)
+transform = Transform3D(-0.707107, -0.707107, -6.18172e-08, -4.37114e-08, -4.37114e-08, 1, -0.707107, 0.707107, -7.10543e-15, -13.6402, 3, -2.10452)
 use_collision = true
 polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
 depth = 3.0
 material = SubResource("StandardMaterial3D_fxdaq")
 
 [node name="CSGBox3D30" type="CSGPolygon3D" parent="."]
-transform = Transform3D(-0.707107, 0.707107, 6.18172e-08, 4.37114e-08, 1.31134e-07, -1, -0.707107, -0.707107, -1.23634e-07, -13.8541, 0, -1.89433)
+transform = Transform3D(-0.707107, 0.707107, 6.18172e-08, 4.37114e-08, 1.31134e-07, -1, -0.707107, -0.707107, -1.23634e-07, -13.8137, 0, -1.93107)
 use_collision = true
 polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
 depth = 3.0
@@ -347,3 +512,29 @@ material = SubResource("StandardMaterial3D_uatdx")
 transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -12.997, 1.46182, -1.30475)
 pixel_size = 0.0025
 text = "glitch testing"
+
+[node name="CSGBox3D48" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.707107, -0.707107, -6.18172e-08, -4.37114e-08, -4.37114e-08, 1, -0.707107, 0.707107, -7.10543e-15, -16.7505, 3, -2.24789)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+depth = 3.0
+material = SubResource("StandardMaterial3D_fxdaq")
+
+[node name="CSGBox3D49" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-0.707107, 0.707107, 6.18172e-08, 4.37114e-08, 1.31134e-07, -1, -0.707107, -0.707107, -1.23634e-07, -17.1041, 0, -1.89433)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+depth = 3.0
+material = SubResource("StandardMaterial3D_fxdaq")
+
+[node name="CSGBox3D50" type="CSGPolygon3D" parent="."]
+transform = Transform3D(0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, 0.707107, -17.2184, -0.625, -1.65506)
+use_collision = true
+polygon = PackedVector2Array(-1, 0.8125, -1, 0.875, 1, 0.625, 1, 0.5625)
+material = SubResource("StandardMaterial3D_uatdx")
+
+[node name="Label3D18" type="Label3D" parent="."]
+transform = Transform3D(0.707107, 0, 0.707107, 0, 1, 0, -0.707107, 0, 0.707107, -16.122, 1.46182, -1.30475)
+pixel_size = 0.0025
+text = "glitch testing
+(slightly tighter)"

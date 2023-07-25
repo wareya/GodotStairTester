@@ -15,10 +15,6 @@ run/main_scene="res://world.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"
 
-[display]
-
-window/vsync/vsync_mode=3
-
 [input]
 
 forward={

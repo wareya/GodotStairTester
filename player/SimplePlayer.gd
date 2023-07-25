@@ -61,26 +61,27 @@ func handle_friction_and_accel(delta):
     handle_friction(delta)
     handle_accel(delta)
 
-func _is_on_floor() -> bool:
-    return is_on_floor()
-
-@export var do_stairs : bool = false
+@export var do_stairs : bool = true
+@export var do_skipping_hack : bool = false
+@export var skipping_hack_distance : float = 0.08
 
 func _process(delta: float) -> void:
     if $"../StairsSetting":
         do_stairs = $"../StairsSetting".button_pressed
+    if $"../SkippingSetting":
+        do_skipping_hack = $"../SkippingSetting".button_pressed
     
-    $"../FPS".text = str(Engine.get_frames_per_second())
+    $"../FPS".text = "framerate: " + str(Engine.get_frames_per_second())
     $"../Vel".text = str(velocity)
     
     $AABB.disabled = $"../CollisionBox".selected != 0
     $Cylinder.disabled = $"../CollisionBox".selected != 1
     $Capsule.disabled = $"../CollisionBox".selected != 2
     
-    if Input.is_action_pressed("jump") and _is_on_floor():
+    if Input.is_action_pressed("jump") and is_on_floor():
         velocity.y = jumpvel
         floor_snap_length = 0.0
-    elif _is_on_floor():
+    elif is_on_floor():
         floor_snap_length = 0.5
     
     var input_dir := Input.get_vector("left", "right", "forward", "backward")
@@ -92,7 +93,7 @@ func _process(delta: float) -> void:
     
     var step_height = 0.5
     
-    if not _is_on_floor():
+    if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
     # check for simple stairs; three steps
@@ -100,10 +101,11 @@ func _process(delta: float) -> void:
     var found_stairs = false
     var wall_test_travel = null
     var wall_collision = null
-    if do_stairs:
+    if do_stairs and velocity.x != 0.0 and velocity.z != 0.0:
         # step 1: upwards trace
         var ceiling_collision = move_and_collide(step_height * Vector3.UP)
         var ceiling_travel_distance = step_height if not ceiling_collision else abs(ceiling_collision.get_travel().y)
+        var ceiling_position = global_position
         # step 2: "check if there's a wall" trace
         wall_test_travel = velocity * delta
         wall_collision = move_and_collide(wall_test_travel)
@@ -111,6 +113,24 @@ func _process(delta: float) -> void:
         var floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
         if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
             found_stairs = true
+        
+        # NOTE: NOT NECESSARY
+        # try again with a certain minimum horizontal step distance if there was no wall collision and the wall trace was close
+        if do_skipping_hack and !found_stairs and is_on_floor() and !wall_collision and (wall_test_travel * Vector3(1,0,1)).length() < skipping_hack_distance:
+            # go back to where we were at the end of the ceiling collision test
+            global_position = ceiling_position
+            # calculate a new path for the wall test: horizontal only, length of our fallback distance
+            var floor_velocity = Vector3(velocity.x, 0.0, velocity.z)
+            var factor = skipping_hack_distance / floor_velocity.length()
+            
+            # step 2, skipping hack version
+            wall_test_travel = floor_velocity * factor
+            wall_collision = move_and_collide(wall_test_travel, false, 0.0)
+            
+            # step 3, skipping hack version
+            floor_collision = move_and_collide(Vector3.DOWN * (ceiling_travel_distance + (step_height if is_on_floor() else 0.0)))
+            if floor_collision and floor_collision.get_collision_count() > 0 and acos(floor_collision.get_normal(0).y) < floor_max_angle:
+                found_stairs = true
     
     # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
     if found_stairs:
@@ -132,7 +152,7 @@ func _process(delta: float) -> void:
         global_position = start_position
         move_and_slide()
     
-    if not _is_on_floor():
+    if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
     
     $CameraHolder/Camera3D.position.z = 1.5 if $"../ThirdPerson".button_pressed else 0.0
