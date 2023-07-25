@@ -88,6 +88,7 @@ func move_and_climb_stairs(delta):
     if do_stairs and velocity.x != 0.0 and velocity.z != 0.0:
         # step 1: upwards trace
         var up_height = probe_probable_step_height() # NOT NECESSARY. can just be step_height.
+        print(up_height)
         ceiling_collision = move_and_collide(up_height * Vector3.UP)
         ceiling_travel_distance = step_height if not ceiling_collision else abs(ceiling_collision.get_travel().y)
         ceiling_position = global_position
@@ -125,7 +126,7 @@ func move_and_climb_stairs(delta):
     return found_stairs
 
 func probe_probable_step_height():
-    const hull_height = 1.75
+    const hull_height = 1.75 # edit me
     const center_offset = 0.875 # edit to match the offset between your origin and the center of your hitbox
     const hull_width = 0.625 # approximately the full width of your hull
     
@@ -153,9 +154,9 @@ func probe_probable_step_height():
     raycast.force_shapecast_update()
     if raycast.is_colliding():
         #raycast.position = raycast.get_collision_point(0)
-        raycast.position = raycast.get_collision_point(0)
+        raycast.global_position = raycast.get_collision_point(0)
     else:
-        raycast.position += raycast.target_position
+        raycast.global_position += raycast.target_position
     
     var up_distance = 50.0
     raycast.target_position = Vector3(0.0, 50.0, 0.0)
@@ -164,8 +165,8 @@ func probe_probable_step_height():
     if raycast.is_colliding():
         up_distance = raycast.get_collision_point(0).y - raycast.position.y
     
-    var down_distance = 50.0
-    raycast.target_position = Vector3(0.0, -50.0, 0.0)
+    var down_distance = center_offset
+    raycast.target_position = Vector3(0.0, -center_offset, 0.0)
     #raycast.force_raycast_update()
     raycast.force_shapecast_update()
     if raycast.is_colliding():
@@ -204,6 +205,7 @@ func _process(delta: float) -> void:
     
     # CHANGE ME: replace this with your own movement-and-stair-climbing code
     var found_stairs = move_and_climb_stairs(delta)
+    print(found_stairs)
     
     if not is_on_floor():
         velocity.y -= gravity * delta * 0.5
