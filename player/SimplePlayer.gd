@@ -164,9 +164,9 @@ func move_and_climb_stairs(delta : float, allow_stair_snapping : bool):
                 found_stairs = true
             # NOTE: NOT NECESSARY
             # try to skip over small sloped walls if we failed to find a stair and the skipping hack is enabled
-            if floor_collision.get_normal(0).y < floor_normal:
+            if !floor_collision or floor_collision.get_normal(0).y < floor_normal:
                 check_and_attempt_skipping_hack(0.01, floor_normal)
-            if floor_collision.get_normal(0).y < floor_normal and do_skipping_hack:
+            if !floor_collision or floor_collision.get_normal(0).y < floor_normal and do_skipping_hack:
                 check_and_attempt_skipping_hack(skipping_hack_distance, floor_normal)
     
     # (this section is more complex than it needs to be, because of move_and_slide taking velocity and delta for granted)
@@ -276,13 +276,14 @@ func _process(delta: float) -> void:
     
     add_collision_debug_visualizer(delta)
 
+const stick_camera_speed = 240.0
 func handle_stick_input(delta):
-    var camera_dir := Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down")
+    var camera_dir := Input.get_vector("camera_left", "camera_right", "camera_up", "camera_down", 0.15)
     var tilt = camera_dir.length()
-    var acceleration = pow(4.0, min(tilt, 1.0) - 1.0)
+    var acceleration = lerp(0.25, 1.0, tilt)
     camera_dir *= acceleration
-    $CameraHolder.rotation_degrees.y -= camera_dir.x * 240.0 * delta
-    $CameraHolder.rotation_degrees.x -= camera_dir.y * 240.0 * delta
+    $CameraHolder.rotation_degrees.y -= camera_dir.x * stick_camera_speed * delta
+    $CameraHolder.rotation_degrees.x -= camera_dir.y * stick_camera_speed * delta
     $CameraHolder.rotation_degrees.x = clamp($CameraHolder.rotation_degrees.x, -90.0, 90.0)
 
 func _input(event: InputEvent) -> void:
